@@ -2,16 +2,16 @@
 
 namespace Akeneo\Connector\Setup;
 
+use Akeneo\Connector\Block\Adminhtml\System\Config\Form\Field\Configurable as TypeField;
+use Akeneo\Connector\Helper\Config as ConfigHelper;
+use Akeneo\Connector\Helper\Serializer as JsonSerializer;
+use Magento\Framework\App\Config\ConfigResource\ConfigInterface;
+use Magento\Framework\App\Config\ScopeConfigInterface;
+use Magento\Framework\DB\Adapter\AdapterInterface;
 use Magento\Framework\DB\Ddl\Table;
-use Magento\Framework\Setup\UpgradeSchemaInterface;
 use Magento\Framework\Setup\ModuleContextInterface;
 use Magento\Framework\Setup\SchemaSetupInterface;
-use Magento\Framework\DB\Adapter\AdapterInterface;
-use Magento\Framework\App\Config\ScopeConfigInterface;
-use Magento\Framework\App\Config\ConfigResource\ConfigInterface;
-use Akeneo\Connector\Helper\Serializer as JsonSerializer;
-use Akeneo\Connector\Helper\Config as ConfigHelper;
-use Akeneo\Connector\Block\Adminhtml\System\Config\Form\Field\Configurable as TypeField;
+use Magento\Framework\Setup\UpgradeSchemaInterface;
 
 /**
  * Class UpgradeSchema
@@ -19,7 +19,7 @@ use Akeneo\Connector\Block\Adminhtml\System\Config\Form\Field\Configurable as Ty
  * @category  Class
  * @package   Akeneo\Connector\Setup
  * @author    Agence Dn'D <contact@dnd.fr>
- * @copyright 2019 Agence Dn'D
+ * @copyright 2004-present Agence Dn'D
  * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  * @link      https://www.dnd.fr/
  */
@@ -214,6 +214,21 @@ class UpgradeSchema implements UpgradeSchemaInterface
             )->setComment('Akeneo Connector Job');
 
             $installer->getConnection()->createTable($table);
+        }
+
+        if (version_compare($context->getVersion(), '1.0.6', '<')) {
+            /**
+             * Update column message in table 'akeneo_connector_import_log_step'
+             */
+            /** @var Table $table */
+            $table = $setup->getTable('akeneo_connector_import_log_step');
+            if ($setup->getConnection()->isTableExists($table)) {
+                $setup->getConnection()->modifyColumn(
+                    $table,
+                    'message',
+                    Table::TYPE_TEXT,
+                    );
+            }
         }
 
         $installer->endSetup();
