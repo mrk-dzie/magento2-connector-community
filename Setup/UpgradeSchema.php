@@ -226,8 +226,8 @@ class UpgradeSchema implements UpgradeSchemaInterface
                 $setup->getConnection()->modifyColumn(
                     $table,
                     'message',
-                    Table::TYPE_TEXT,
-                    );
+                    Table::TYPE_TEXT
+                );
             }
         }
 
